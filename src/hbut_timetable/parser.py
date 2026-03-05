@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from html import unescape
 from typing import Any
 
 from bs4 import BeautifulSoup
@@ -91,8 +92,14 @@ def _has_alias(keys: set[str], logical_name: str) -> bool:
 def _get_str(item: dict[str, Any], logical_name: str) -> str:
     for key in KEY_ALIASES[logical_name]:
         if key in item and item[key] is not None:
-            return str(item[key]).strip()
+            return _clean_text(str(item[key]))
     return ""
+
+
+def _clean_text(value: str) -> str:
+    # sdpkkbList fields may embed HTML snippets like <a href=...>课程名</a>.
+    plain = BeautifulSoup(unescape(value), "html.parser").get_text(" ", strip=True)
+    return plain.strip()
 
 
 def _rule_from_dict(item: dict[str, Any]) -> CourseRule | None:
