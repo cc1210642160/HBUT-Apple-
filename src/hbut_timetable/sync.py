@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import random
+import re
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -165,6 +166,28 @@ def _fetch_timetable_payload(
             if "login" in final_url or "统一身份认证" in body or "authserver" in final_url:
                 raise SyncError("Cookie seems invalid/expired: redirected to login.")
 
+            # HBUT returns HTML shell first; actual course rows come from sdpkkbList.
+            if "text/html" in content_type.lower() and "/admin/pkgl/xskb/sdpkkbList" in body:
+                xhid = _extract_hidden_input(body, "xhid")
+                xqdm = _extract_hidden_input(body, "xqdm") or "1"
+                api_url = _build_api_url(timetable_url, "/admin/pkgl/xskb/sdpkkbList")
+                api_resp = session.get(
+                    api_url,
+                    params={
+                        "xnxq": xnxq,
+                        "xhid": xhid,
+                        "xqdm": xqdm,
+                        "zdzc": "",
+                        "zxzc": "",
+                        "xskbxslx": "0",
+                    },
+                    timeout=timeout_sec,
+                    allow_redirects=True,
+                )
+                if api_resp.status_code >= 400:
+                    raise SyncError(f"sdpkkbList request failed: HTTP {api_resp.status_code}")
+                return api_resp.text, api_resp.headers.get("content-type", "application/json")
+
             return body, content_type
         except Exception as exc:
             last_error = exc
@@ -214,3 +237,21 @@ def load_env_or_fail(name: str) -> str:
     if not value:
         raise SyncError(f"Environment variable missing: {name}")
     return value
+
+
+def _extract_hidden_input(html: str, field_name: str) -> str:
+    m = re.search(
+        rf'<input[^>]+id=["\']{re.escape(field_name)}["\'][^>]*value=["\']([^"\']*)["\']',
+        html,
+        flags=re.IGNORECASE,
+    )
+    if not m:
+        raise SyncError(f"Failed to locate hidden field '{field_name}' in timetable HTML.")
+    return m.group(1).strip()
+
+
+def _build_api_url(page_url: str, api_path: str) -> str:
+    m = re.match(r"^(https?://[^/]+)", page_url)
+    if not m:
+        raise SyncError("Invalid timetable URL.")
+    return f"{m.group(1)}{api_path}"

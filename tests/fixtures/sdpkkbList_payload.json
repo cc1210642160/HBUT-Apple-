@@ -1,0 +1,23 @@
+{
+  "ret": 0,
+  "data": [
+    {
+      "kcmc": "高等数学",
+      "tmc": "张老师",
+      "croommc": "教一-101",
+      "xingqi": 1,
+      "djc": 1,
+      "zcstr": "1-16",
+      "remarks": ""
+    },
+    {
+      "kcmc": "大学英语",
+      "tmc": "李老师",
+      "croommc": "教二-202",
+      "xingqi": 3,
+      "djc": 5,
+      "zcstr": "1-16(单)",
+      "remarks": "单双周测试"
+    }
+  ]
+}

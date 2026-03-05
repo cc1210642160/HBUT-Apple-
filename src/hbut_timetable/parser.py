@@ -11,12 +11,12 @@ from .models import CourseRule
 # Common key aliases seen in Chinese timetable systems.
 KEY_ALIASES = {
     "course_name": ["kcmc", "courseName", "课程名称", "课程", "name"],
-    "teacher": ["jsxm", "teacherName", "教师", "任课教师", "teacher"],
-    "location": ["cdmc", "jsmc", "roomName", "上课地点", "地点", "location"],
-    "note": ["bz", "remark", "备注", "note"],
-    "weekday": ["xqj", "weekday", "星期", "周几", "dayOfWeek"],
-    "week_expr": ["zcd", "weekExpr", "周次", "weeks"],
-    "period_expr": ["jcor", "jc", "section", "节次", "periods"],
+    "teacher": ["tmc", "jsxm", "teacherName", "教师", "任课教师", "teacher"],
+    "location": ["croommc", "cdmc", "jsmc", "roomName", "上课地点", "地点", "location"],
+    "note": ["remarks", "bz", "remark", "备注", "note"],
+    "weekday": ["xingqi", "xqj", "weekday", "星期", "周几", "dayOfWeek"],
+    "week_expr": ["zcstr", "zcd", "weekExpr", "周次", "weeks"],
+    "period_expr": ["djc", "jcor", "jc", "section", "节次", "periods"],
     "odd_even": ["dsz", "oddEven", "单双周"],
 }
 
@@ -184,11 +184,15 @@ def _normalize_week_expr(value: str) -> str:
     value = value.replace(" ", "")
     value = value.replace("第", "")
     value = value.replace("星期", "")
+    if value and "周" not in value:
+        value = value + "周"
     return value
 
 
 def _normalize_period_expr(value: str) -> str:
     value = value.replace(" ", "")
+    if value and "节" not in value and value.isdigit():
+        value = value + "节"
     return value
 
 
