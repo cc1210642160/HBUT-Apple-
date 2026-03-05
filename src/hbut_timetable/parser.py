@@ -17,7 +17,7 @@ KEY_ALIASES = {
     "note": ["remarks", "bz", "remark", "备注", "note"],
     "weekday": ["xingqi", "xqj", "weekday", "星期", "周几", "dayOfWeek"],
     "week_expr": ["zcstr", "zcd", "weekExpr", "周次", "weeks"],
-    "period_expr": ["djc", "jcor", "jc", "section", "节次", "periods"],
+    "period_expr": ["ksxs", "djc", "jcor", "jc", "section", "节次", "periods"],
     "odd_even": ["dsz", "oddEven", "单双周"],
 }
 
@@ -198,6 +198,24 @@ def _normalize_week_expr(value: str) -> str:
 
 def _normalize_period_expr(value: str) -> str:
     value = value.replace(" ", "")
+    # HBUT often provides big-slot info like: 1(1~2)[08:20~09:55]
+    m = re.match(r"^(\d+)\(", value)
+    if m:
+        return f"{m.group(1)}节"
+    # Fallback: a numeric row index from page table. Merge duplicated rows by mapping
+    # two-row blocks (and 3-row evening block) to a single big slot.
+    if value.isdigit():
+        n = int(value)
+        if n in (1, 2):
+            return "1节"
+        if n in (3, 4):
+            return "2节"
+        if n in (5, 6):
+            return "3节"
+        if n in (7, 8):
+            return "4节"
+        if n in (9, 10, 11):
+            return "5节"
     if value and "节" not in value and value.isdigit():
         value = value + "节"
     return value

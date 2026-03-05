@@ -26,6 +26,8 @@ def test_ics_contains_required_fields_and_stable_uid():
     assert "BEGIN:VEVENT" in ics_1
     assert "UID:" in ics_1
     assert "DTSTART;TZID=Asia/Shanghai:20260223T080000" in ics_1
+    assert "DESCRIPTION:Teacher: 张老师" in ics_1
+    assert "Week:" not in ics_1
 
     uid_1 = [ln for ln in ics_1.splitlines() if ln.startswith("UID:")][0]
     uid_2 = [ln for ln in ics_2.splitlines() if ln.startswith("UID:")][0]

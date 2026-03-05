@@ -62,15 +62,7 @@ def build_ics(
 
 
 def _build_description(e: EventOccurrence) -> str:
-    parts = [
-        f"Teacher: {e.teacher or 'N/A'}",
-        f"Week: {e.week_no}",
-        f"Weekday: {e.weekday}",
-        f"Periods: {e.period_expr}",
-    ]
-    if e.note:
-        parts.append(f"Note: {e.note}")
-    return "\\n".join(parts)
+    return f"Teacher: {e.teacher or 'N/A'}"
 
 
 def _stable_uid(e: EventOccurrence) -> str:

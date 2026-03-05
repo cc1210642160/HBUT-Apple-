@@ -27,6 +27,21 @@ def test_parse_sdpkkb_list_payload_extracts_rules():
     assert rules[0].week_expr == "1-16周"
 
 
+def test_parse_maps_duplicate_row_index_to_same_big_period():
+    payload = """
+    {
+      "ret": 0,
+      "data": [
+        {"kcmc":"嵌入式系统","tmc":"崔贤岱","croommc":"2-005","xingqi":2,"djc":1,"zcstr":"1-10"},
+        {"kcmc":"嵌入式系统","tmc":"崔贤岱","croommc":"2-005","xingqi":2,"djc":2,"zcstr":"1-10"}
+      ]
+    }
+    """
+    rules = parse_timetable_payload(payload, content_type="application/json")
+    assert len(rules) == 1
+    assert rules[0].period_expr == "1节"
+
+
 def test_parse_strips_html_tags_from_course_fields():
     payload = """
     {
