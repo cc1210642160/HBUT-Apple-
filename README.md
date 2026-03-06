@@ -18,7 +18,7 @@
 - `config/calendar_meta.json`：日历元信息
 - `docs/`：Pages 发布目录（运行时生成 `.ics`，不再提交回仓库）
 - `.github/workflows/sync-ics.yml`：定时同步
-- `.github/workflows/validate-cookie.yml`：手动校验 Cookie
+- `.github/workflows/validate-cookie.yml`：定时/手动校验 Cookie
 - `tests/`：单元测试
 
 ## 1. 本地准备
@@ -107,7 +107,8 @@ hbut-check-cookie --repo-root .
   - 失败时自动创建 issue 提醒排障
 
 - `validate-cookie.yml`：
-  - 手动触发
+  - 每天 06:30（北京时间）自动触发
+  - 也支持手动触发
   - 快速判断 `HBUT_COOKIE` 是否过期/失效
 
 ## 7. Apple 日历订阅
