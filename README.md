@@ -16,7 +16,7 @@
 - `config/term.json`：学期参数
 - `config/periods.json`：节次起止时间
 - `config/calendar_meta.json`：日历元信息
-- `docs/`：发布的 `.ics` 文件目录（由 Actions 更新）
+- `docs/`：Pages 发布目录（运行时生成 `.ics`，不再提交回仓库）
 - `.github/workflows/sync-ics.yml`：定时同步
 - `.github/workflows/validate-cookie.yml`：手动校验 Cookie
 - `tests/`：单元测试
@@ -72,8 +72,7 @@ pytest
 
 3. 在 `Settings -> Pages`：
 
-- Source 选择 `Deploy from a branch`
-- Branch 选择默认分支 + `/docs`
+- Source 选择 `GitHub Actions`
 
 ## 5. 手动运行与校验
 
@@ -86,6 +85,12 @@ hbut-sync --repo-root . --no-jitter
 ```
 
 输出文件：`docs/<ICS_TOKEN>.ics`
+
+如果你不想在本地生成 `latest-sync.json`：
+
+```bash
+hbut-sync --repo-root . --no-jitter --skip-meta
+```
 
 ### 只校验 Cookie 是否可用
 
@@ -119,7 +124,7 @@ hbut-check-cookie --repo-root .
 
 - 提示跳转登录：`HBUT_COOKIE` 失效，重新抓取并更新 Secret
 - 课程数量为 0：课表接口字段结构变化，需按真实响应更新 `parser.py`
-- 订阅没变化：检查 Actions 是否成功、`docs/<ICS_TOKEN>.ics` 是否更新、Apple 端是否已刷新
+- 订阅没变化：检查 Actions 是否成功、Pages 部署是否成功、Apple 端是否已刷新
 
 ## 9. 防封禁策略（已内置）
 

@@ -12,6 +12,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--xnxq", default=None, help="Override term identifier, e.g. 2025-2026-2")
     parser.add_argument("--no-jitter", action="store_true", help="Disable random anti-ban jitter")
     parser.add_argument("--timetable-url", default=None, help="Override timetable endpoint URL")
+    parser.add_argument("--skip-meta", action="store_true", help="Do not write latest-sync.json")
     return parser
 
 
@@ -27,10 +28,9 @@ def main() -> int:
             xnxq_override=args.xnxq,
             timetable_url=args.timetable_url or "https://hbut.jw.chaoxing.com/admin/pkgl/xskb/queryKbForXsd",
             apply_jitter=not args.no_jitter,
+            write_meta=not args.skip_meta,
         )
-        print(
-            f"Sync completed: rules={result.rule_count}, events={result.event_count}, output={result.output_path}"
-        )
+        print(f"Sync completed: rules={result.rule_count}, events={result.event_count}")
         return 0
     except SyncError as exc:
         print(f"Sync failed: {exc}")

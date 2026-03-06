@@ -49,6 +49,7 @@ def run_sync(
     user_agent: str = DEFAULT_USER_AGENT,
     xnxq_override: str | None = None,
     apply_jitter: bool = True,
+    write_meta: bool = True,
 ) -> SyncResult:
     if not cookie.strip():
         raise SyncError("HBUT_COOKIE is empty.")
@@ -97,15 +98,16 @@ def run_sync(
     output_path = docs_dir / f"{ics_token}.ics"
     output_path.write_text(ics_text, encoding="utf-8")
 
-    meta_path = docs_dir / "latest-sync.json"
-    meta = {
-        "generated_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-        "event_count": len(events),
-        "rule_count": len(rules),
-        "xnxq": term_cfg.xnxq,
-        "output": output_path.name,
-    }
-    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    if write_meta:
+        meta_path = docs_dir / "latest-sync.json"
+        meta = {
+            "generated_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            "event_count": len(events),
+            "rule_count": len(rules),
+            "xnxq": term_cfg.xnxq,
+            "output": output_path.name,
+        }
+        meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return SyncResult(event_count=len(events), rule_count=len(rules), output_path=output_path)
 

@@ -45,3 +45,35 @@ def test_run_sync_writes_ics_and_meta(monkeypatch, tmp_path: Path):
     assert result.event_count > 0
     assert (tmp_path / "docs" / "tok123.ics").exists()
     assert (tmp_path / "docs" / "latest-sync.json").exists()
+
+
+def test_run_sync_can_skip_meta(monkeypatch, tmp_path: Path):
+    import hbut_timetable.sync as sync_mod
+
+    (tmp_path / "config").mkdir()
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "config" / "term.json").write_text(
+        '{"xnxq":"2025-2026-2","term_start":"2026-03-02","term_end":"2026-07-05","timezone":"Asia/Shanghai"}',
+        encoding="utf-8",
+    )
+    (tmp_path / "config" / "calendar_meta.json").write_text(
+        '{"name":"HBUT 课程表","prodid":"-//HBUT//EN","timezone":"Asia/Shanghai"}', encoding="utf-8"
+    )
+    (tmp_path / "config" / "periods.json").write_text(
+        '{"1":{"start":"08:20","end":"09:55"},"5":{"start":"18:30","end":"20:55"}}',
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(sync_mod.requests, "Session", DummySession)
+
+    result = run_sync(
+        cookie="foo=bar",
+        ics_token="tok123",
+        repo_root=tmp_path,
+        apply_jitter=False,
+        write_meta=False,
+    )
+
+    assert result.rule_count == 2
+    assert (tmp_path / "docs" / "tok123.ics").exists()
+    assert not (tmp_path / "docs" / "latest-sync.json").exists()
